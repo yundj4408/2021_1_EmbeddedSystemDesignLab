@@ -103,7 +103,10 @@ The user vimrc files(s):
 
 ​		2. vim 안에서 :e ~/.vimrc를 치면 바로 .vimrc파일이 열린다. 
 
-​		
+​	
+
+
+
 
 (vimrc 설정 명령어)
 
@@ -149,6 +152,8 @@ The user vimrc files(s):
 
 
 
+
+
 ### 2.4 Vim 모드
 
 ​		**1.** **Normal Mode(Command Mode) :** 일반/명령 모드
@@ -179,7 +184,7 @@ The user vimrc files(s):
 
 ​		
 
-​		4. **Command-line Mode : **명령라인 모드
+​		**4. Command-line Mode :** 명령라인 모드
 
 ​		명령라인 모드는 명령 입력으로 여러 가지 일을 수행할 수 있는 모드이다. 
 
@@ -188,6 +193,8 @@ The user vimrc files(s):
 ​		
 
 ​		모드 변경은 밑에 있는 그림을 참고하면 된다. 
+
+
 
 ------
 
