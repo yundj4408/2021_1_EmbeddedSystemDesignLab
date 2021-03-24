@@ -127,7 +127,7 @@ target ... : dependencies ...
 
 왼쪽 gvim 화면은 첫 시간에 만든 makefile이고, 오른쪽 gvim 화면은 이번 수업 시간에 만든 것이다. 
 
-![makefile Dependency](./Pictures/makefileDependency.png)
+![makefile Dependency](./Pictures/makefile Dependency.png)
 
 원래는 all이라는 target에 모든 컴파일 옵션을 넣어서 make all을 통해 command가 실행되었다. 
 
