@@ -26,16 +26,88 @@
 
   
 
+- #### ARM에선 스택을 위한 명령어가 따로 존재하지 않음 (ex. push, pop X)
+
+  - **장점 :** CALL을 연속적으로 사용하는 경우가 아닌, 한번만 CALL 했을 때, 스택을 사용하지 않고, 레지스터를 사용함으로써 속도면에서 큰 이득.
+  - **단점** : CALL이 연속적인 즉, 어떤 서브 루틴에서 또 다른 서브 루틴을 콜 했을 때, lr에 복귀할 주소가 또 들어가게 되면서, lr값을 덮어쓰게 한게 된다. 이럴 땐 수동으로 sp(r13)을 이용해 스택에 r14값들을 넣어줘야 한다. 
+  
+- #### ARM Core 로드맵
+
+  ![ARMCore](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/ARMCore.png)
+
+  - 클래식 ARMCore
+  - Cortex 암코어 : 응용 프로세스용, 임베디드용
+  - 각 프로세서 군의 특성을 파악 -> 설계 목표에 부합하는 프로세서 선정
+  - 최신 프로세서 구조의 발전 흐름을 알아볼 수 있음
+  - VFP 부동소수점 고속 연산
+  - Jazelie 자바 명령어 가속
+  - 응용프로세서 : 임베디드 프로세서보다 더 큰 의미로 OS를 올릴 수 있다. 
+
+
+
+### 2. ARM의 구조와 명령어 실행 
+
+
+
+### 2. ARM Instruction Set Format
+
 - #### 레지스터
 
-  레지스터는 x86과 상당한 차이점이 있다. 일단 범용 레지스터의 수가 더 많으며, x86에는 존재하지 않는 Link Register가 존재한다.
+  레지스터는 임시로 데이터를 보관하고, 연산에 사용되고, 프로그램 제어에 사용되는 접근 속도가 가장 빠른 임시 기억 장치이다. 
+
+  x86과 상당한 차이점이 있다. 일단 범용 레지스터의 수가 더 많으며, x86에는 존재하지 않는 Link Register가 존재한다. 왜 레지스터가 많이 안 쓰는가? 가격 때문인거지 암암. 근데 더 쓸려면 더 쓸 수 잇다. 설계할 때 32개 쓰면 1비트 더 추가하면 된다 원래 2^4니 4비트인데.
 
   - **R0~R12 :** 범용 레지스터, 인자값 및 임시 계산 저장소 등
-  - **R13(SP)** : Stack Pointer, x86의 ESP와 비슷한 역할 수행
+
+    - **r0 : **Return value, first function argument
+
+  - **R13(SP)** : Stack Pointer, x86의 ESP와 비슷한 역할 수행, ARM 동작 모드별로 스택 포인터를 가르키고 있다. 
+
   - **R14(LR) : **Link Register, 함수 호출 전 LR에 리턴 주소를 저장하고 점프함 (함수 호출 시 리턴주소 스택 활용 X)
+
+    - 함수 호출 시 복귀할 주소를 저장하기 위해서 레지스터까지 1개를 할당했는데 여러번 분기 (BL)하는 경우가 아닌 한번만 분기(BL)하는 경우라면, 함수에서 원래의 주소로 복귀할 때 스택을 사용하지 않고 R14 레지스터를 사용함으로써, 그 속도에서 이익을 얻게 되는 것입니다. 
+
+      **스택 접근 = 메인 메모리 접근 = 느림**
+
+  - **R15(PC)** : 
+
   - **PC : ** x86에서의 EIP 레지스터와 동일한 역할 수행. 다음에 실행할 코드의 주소 저장
 
   
+
+  - ARM의 32bit 레지스터 (16개의 integer register, 각 레지스터는 32bit)
+
+    | Register | ABI Name | Description                           | Volatile     |
+    | -------- | -------- | ------------------------------------- | ------------ |
+    | r0       |          | Parameter, result, scratch register 1 | Volatile     |
+    | r1       |          | Parameter, result, scratch register 2 | Volatile     |
+    | r2       |          | Parameter, scratch register 3         | Volatile     |
+    | r3       |          | Parameter, scratch register 4         | Volatile     |
+    | r4-10    |          | -                                     | Non-volatile |
+    | r11      |          | Frame pointer                         | Non-volatile |
+    | r12      | IP       | Intra-procedure-call scratch register | Volatile     |
+    | r13      | SP       | Stack pointer                         | Non-volatile |
+    | r14      | LR       | Link register                         | Non-volatile |
+    | r15      | PC       | Program counter                       | Non-volatile |
+
+    
+
+  - ARM의 64bit 레지스터 (32개의 integer register, x31은 특수 인코딩 레지스터)
+
+    | Register | ABI Name | Description                                   | Volatile     |
+    | -------- | -------- | --------------------------------------------- | ------------ |
+    | X0       |          | Parameter/scratch register 1, result register | Volatile     |
+    | X1-7     |          | Parameter/scratch register 2-8                | Volatile     |
+    | X8-15    |          | Scratch registers                             | Volatile     |
+    | X16-17   |          | Intra-procedure-call scratch registers        | Volatile     |
+    | X18      |          | Platform registe                              | Non-volatile |
+    | X19-28   |          | Scratch registers                             | Non-volatile |
+    | X29      | FP       | Frame pointer                                 | Non-volatile |
+    | X30      | LR       | Link registers                                | Non-volatile |
+
+    가장 중요한 점은 **Stack pointer가 General purpose register에서 제외**되고 x31레지스터에 인코딩 됐다.
+
+    
 
 - #### Calling Convention (함수 호출 규약)
 
@@ -43,6 +115,18 @@
 
   - **R0~R12 : **범용 레지스터, 인자값 및 임시 계산 저장소 등
   - **R13(SP) : **Stack Pointer, x86의 ESP와 비슷한 역할 수행
+
+  
+
+- #### ARM Instruction Set
+
+  - ARM 32bit의 Instruction Set
+    ![32bitARMISA](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/32bitARMISA.png)
+
+  - ARM 64bit의 Instruction Set
+
+    ![64bitARMISA](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/64bitARMISA.png)
+    기존 T32와 A32를 이용하는 방식이다. 
 
   
 
@@ -92,13 +176,14 @@
   **LDR :** 해당 메모리 주소의 값을 레지스터에 저장 (연산방향 : <-)
 
   ex) **LDR R1, [R1, #4] :** R1에 4byte 더한 주소에 저장되어 있는 값을 R1에 저장
-  
 
-- #### ARM에선 스택을 위한 명령어가 따로 존재하지 않음 (ex. push, pop X)
 
-  - **장점 :** CALL을 연속적으로 사용하는 경우가 아닌, 한번만 CALL 했을 때, 스택을 사용하지 않고, 레지스터를 사용함으로써 속도면에서 큰 이득.
-  - **단점** : CALL이 연속적인 즉, 어떤 서브 루틴에서 또 다른 서브 루틴을 콜 했을 때, lr에 복귀할 주소가 또 들어가게 되면서, lr값을 덮어쓰게 한게 된다. 이럴 땐 수동으로 sp(r13)을 이용해 스택에 r14값들을 넣어줘야 한다. 
 
-- 
 
-### 1. ARM Instruction Set Format
+
+
+
+
+
+
+
