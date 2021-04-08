@@ -1,4 +1,4 @@
-# WEEK5
+WEEK5
 
 ### gdb를 이용하여 step instruction 추적을 통해 실행과정 분석
 
@@ -161,7 +161,7 @@ GDB는 임베디드 시스템을 디버깅할 때 사용되는 '원격' 모드�
 
    
 
-#### 2. Subtraction
+#### 1. Add
 
 **main.c**
 
@@ -170,15 +170,13 @@ GDB는 임베디드 시스템을 디버깅할 때 사용되는 '원격' 모드�
 //#define POHW (*(unsigned char*)POHW_ADDR) 
 
 int main(){
-    char P0;    //char 선언
+    char P0;    //char 선언 
     char P1;
     char P2;
-   
     // clear
-    P0 = 0x95;
-    P1 = 0x90;
-
-    P2 = P0 - P1
+    P0 = 0x05;
+    P1 = 0x15;
+    P2 = P0 + P1;
     
     //POHW_ADDR = 0x4F;
     
@@ -186,77 +184,268 @@ int main(){
 }
 ```
 
- 
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/add1.png" alt="add1" style="zoom: 50%;" />
 
+```
+sub sp,#12		<- stack pointer - 12를 한 이유는 원래 저장되어 있던 메모리 값에서 그대로 사용하면 이전
+				<- 에 사용되던 메모리 안에 있는 값들이 사라질 수 있기 때문이다. 
+add r7, sp, #0	<- sp - 12 한 공간의 주소를 r7에 저장한다. 
+movs r3, #5		<- movs는 immediate value를 해당 destination register r3에 쓰는 것이다. 
+```
 
+arm에는 32,64bit architecture가 있다. 32bit 아키텍쳐는 legacy와 cortex로 나뉘는데 우리가 쓰는 아키텍처 버전은 ARMv7E-M, 즉 코어가 Cortex-M4이다. 현재 Thumb모드를 사용 중이다. 
 
+![movs](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/movs.png)
 
 
 
+movs r3, #5 -> 0010 0 011 0000 0101(0x2305) 메모리에 적재 될땐, ARM은 little-endian 방식으로 저장되니  LSB부터 저장된다. 1바이트씩 적재 되니 05 23으로 적재된다. 그림과 같다는 걸 볼 수 있다.  그래서 register r3에 5가 저장되었다. 
 
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/movs21.png" alt="movs21" style="zoom:50%;" />
 
+```
+strb r3, [r7, #7]	<- 이 명령어를 통해 r3의 값을 r7가 가지고 있는 주소값 +7
+movs r3, #21		<- 이 명령어를 통해 r3의 레지스터 값 15로 변경, r3의 값을 메모리에 올렸으니 P1의 값						 을 저장하기 위해 movs r3, #21
+```
 
+Stack은 Thumb Mode 16 bit이기 때문에  어셈블리어 한 줄당 2바이트라고 생각하면 된다. 
 
+pc는 실행할 어셈블리어의 주소를 가르킨다. 
 
 
 
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/ldrbop.png" alt="ldrbop" style="zoom:50%;" />
 
+```
+strb r3, [r7, #6]		<- r7 + 6 주소에 현재 r3에 있는 값 0x21를 넣는다. 
+```
 
+![STRB(immediate)](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/STRB(immediate).png)
 
+0111 0001 1011 1011 -> 0x 71bb, Little Endian 방식으로 저장되니 bb 71
 
 
 
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/ldrbr2r3.png" alt="ldrbr2r3" style="zoom:50%;" />
 
+메모리에 적재되어 있던 값을 레지스터에 옮겨주었다.
 
+<img src="/home/dongjun/Pictures/strbr3.png" alt="strbr3" style="zoom:50%;" />
 
+```
+add r3, r2
+strb r3, [r7, #5]			<- add r3 r2한 것을 메모리 0xffffffc5번지에 저장해줬다.
+```
 
+![addregister](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/addregister.png)
 
+0100 0100 0001 0101 -> 0x 4413 -> 13 44 형태로 저장된다. 여기서 DN은 0이다. floating Number가 아니기 때문에. (DN 질문하기)
 
 
 
+#### 2. Sub, if else, for, call
 
+**main.c**
 
+```
+int sub(int a, int b);
 
+int main(){
+    int P0 = 0x10;    //char 선언 
+    int P1 = 0x30;
+    int P2;
+    int i;
+    // clear
+    
+    for (i=0; i<5; i++)
+    {
+        if (P1 == 0x0) break;
+        else P2 = sub(P1, P0);
+    }
+    //POHW_ADDR = 0x4F;
+    
+	while(1);
+}
 
+int sub(int a, int b) {
+    return a-b;
+}
+```
 
 
 
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/Total1.png" alt="Total1" style="zoom:50%;" />
 
+**R14** : Link Register**(LR)**은 함수 호출하고 돌아올 주소를 저장해 놓은 레지스터이다. 
 
+**MSP(Main Stack Pointer)** : 뭔지 모르겠다. 
 
+**CPSR(Current Program Status Register)** : 연산결과, IRQ, FIQ금지, 동작모드 등을 저장	
 
+**LR(Link Register) : ** 함수 호출시 되돌아갈 함수의 주소 저장 
 
+**FAULTMASK :**
 
+```
+push {r7, lr}
+sub sp, #16				<- sp = sp -16
+add r7, sp, #0			<- r7 = sp
+```
 
 
 
+<img src="/home/dongjun/Pictures/movandstr.png" alt="movandstr" style="zoom:50%;" />
 
+```
+0x0800019a 10 23 main+6  movs	r3, #16
+0x0800019c bb 60 main+8  str	r3, [r7, #8]
+0x0800019e 30 23 main+10 movs	r3, #48	; 0x30
+0x080001a0 7b 60 main+12 str	r3, [r7, #4]
+```
 
+movs와 str를 통해 메모리에 적재하였다. 
 
 
 
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/beforeif.png" alt="beforeif" style="zoom:50%;" />
 
+```
+   0x080001a2 <+14>:	movs	r3, #0			<-movs 명령어를 통해 r3에 0을 저장해놨고
+   0x080001a4 <+16>:	str	r3, [r7, #12]		<-store 명령어를 통해 저장을 하고,
+=> 0x080001a6 <+18>:	b.n	0x80001be <main+42> <- branch문을 통해 ldr 명령어로 이동
+   0x080001be <+42>:	ldr	r3, [r7, #12]
+```
 
 
 
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/branch ldrr3.png" alt="branch ldrr3" style="zoom: 50%;" />
 
+pc값이 jump한 주소로 바꼈다는 것을 확인 할 수 있고 ldr를 통해 메모리에 있는 값을 r3에 들고 왔다. 
 
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/cmpr3,4.png" alt="cmpr3,4" style="zoom:50%;" />
 
+```
+cmp r3, #4 <- 0 - 4 = -4 0보다 작으니 flag가 -1?로 setting된다. 
+```
 
+![cmp immediate opcode](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/cmp immediate opcode.png)
 
+0010 1011 0000 0100 -> 0x2b04  -> little endian 방식이니 04 2b
 
 
 
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/if.png" alt="if" style="zoom:50%;" />
 
+cmp 부분에서 i<5보다 작기 때문이고 flag값으로 인해 ble.n 0x80001a8<main+20>로 이동하여 if문을 실행한다.
 
 
 
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/next.png" alt="next" style="zoom:50%;" />
 
+ if문이 돌아가는 초입부이다. 일단 r3에 r7 #12에 있는 0x30을 들고 온다. 
 
 
 
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/beq.png" alt="beq" style="zoom:50%;" />
 
+```
+cmp r3, #0					<- r3과 0이랑 같은지 확인
+beq.n 0x80001c6 <main+50>	<- r3와 0이 같지 않기 때문에 다음 명령어로 이동.
+```
 
+
+
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/bl.png" alt="bl" style="zoom:50%;" />
+
+else 부분에 있는 sub함수로 branch한다.  
+
+![bl opcode](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/bl opcode.png)
+
+??? 미궁 그자체 나중에 하자. 나중에 하자 일단
+
+
+
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/subfunction.png" alt="subfunction" style="zoom:50%;" />
+
+sub함수로 들어왔다. push r7을 통해 원래 r7에 있는 값을 stack에 미리 옮겨 놓았다. 
+
+lr 0x080001b7로 저장이 되었는데 다시 돌아가야 하는 주소는 0x080001b6인데 왜 7로 된건지 이해가 가지 않는다. (질문 해야함!)
+
+
+
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/SPandMSP.png" alt="SPandMSP" style="zoom:50%;" />
+
+ sp와 MSP가 변경된 것을 알 수 있다. 왜냐하면 sp - 12 하였기 때문이다. 
+
+근데 원래 스택 포인터가 0xffffffe8이였는데 0xffffffd8, 0xe8-0xd8 = 0x10인데 왜??
+
+
+
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/subregisterstore.png" alt="subregisterstore" style="zoom:50%;" />
+
+```
+0x080001d0 78 60 sub+6  str	r0, [r7, #4]
+0x080001d2 39 60 sub+8  str	r1, [r7, #0]
+
+0xffffffd8 10 00 00 00 30 00 00 00 00 00 00 00 e8 ff ff ff ....0...........
+```
+
+
+
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/subregisterload.png" alt="subregisterload" style="zoom:50%;" />
+
+```
+0x080001d4 7a 68 sub+10 ldr	r2, [r7, #4]
+0x080001d6 3b 68 sub+12 ldr	r3, [r7, #0]
+
+r2 0x00000030         r3 0x00000010 
+```
+
+
+
+![returna](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/returna.png)
+
+```
+0x080001da 18 46       sub+16 mov	r0, r3		<- r3값을 r0으로 옮겨준다. 왜냐하면 앞에서 a값을 필요로 하기 때문이다. 
+0x080001dc 0c 37       sub+18 adds	r7, #12		<- sp+12를 통해 sp 복구하기 위해 r7 + 12
+0x080001de bd 46       sub+20 mov	sp, r7		<- mov sp r7를 통해 원래 sp로 복구
+					
+
+```
+
+
+
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/movsp.png" alt="movsp" style="zoom:50%;" />
+
+sp를 원래 있던 곳으로 복구하기 위해 +12해줬다. 근데 왜 0xffffffe4인가? e8이 아니라???
+
+
+
+<img src="/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/stackpointer+4.png" alt="stackpointer+4" style="zoom:50%;" />
+
+```
+ldr.w r7, [sp], #4										opcode :f85d 7b04
+bx lr <-이것을 통해 lr주소로 다시 돌아간다. b6으로 돌아간다. 	 opcode : 4770 
+```
+
+![ldrb opcode](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/ldrb opcode.png)
+
+![BX opcode](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/BX opcode.png)위의 명령어를 통해 sp값을 e8로 복구하였다. 근데 왜 add로 e8까지 안 올리고 ldr.w(w는 word로 32bit)로 하였는지 모르겠다. 
+
+
+
+![strsubfunctionresult](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/strsubfunctionresult.png)
+
+```
+str r0, [r7, #0]		<- 명령어를 통해 return a-b된 값을 메모리에 적재한다. 
+						<- 그리고 다시 for문을 진행 한다. 
+```
+
+
+
+![end](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/end.png)
+
+반복하다가 cmp r3, #4에서 r3값이 4보다 커져서 메인문이 끝났다.
 
 
 
@@ -284,6 +473,10 @@ int main(){
 
 ![store](/home/dongjun/Pictures/store.png)
 
+
+
+
+
 movs r3, #149 레지스터에 올려주고
 
 strb r3, [r7, #7] 현재 스택포인터와 같다.  r3의 값을 r7레지스터 주소값의 7번지 밑에 내려가서 넣어줘라. 그러면 [,]
@@ -293,6 +486,10 @@ strb r3, [r7, #7] 현재 스택포인터와 같다.  r3의 값을 r7레지스터
 n를 누르면 그래서 Instruction 2개로 넘어가버리니
 
 si를 누르면 Instruction 1개 넘어간다. (step instruction)
+
+
+
+
 
 
 

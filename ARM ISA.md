@@ -47,7 +47,9 @@
 
 ### 2. ARM의 구조와 명령어 실행 
 
+https://studylib.net/doc/18252726/arm%C2%AE-and-thumb%C2%AE-2-instruction-set-quick-reference-card (quick reference card)
 
+https://web.eecs.umich.edu/~prabal/teaching/eecs373-f10/readings/ARMv7-M_ARM.pdf 가 armv7-m Architecture 레퍼런스 메뉴얼
 
 ### 2. ARM Instruction Set Format
 
@@ -176,6 +178,18 @@
   **LDR :** 해당 메모리 주소의 값을 레지스터에 저장 (연산방향 : <-)
 
   ex) **LDR R1, [R1, #4] :** R1에 4byte 더한 주소에 저장되어 있는 값을 R1에 저장
+
+
+
+
+
+
+
+
+
+
+
+https://kyuhyuk.kr/article/simple-arm-operating-system/2019/03/04/Simple-ARM-Operating-System-Chapter-2 참고해서 정리
 
 
 
