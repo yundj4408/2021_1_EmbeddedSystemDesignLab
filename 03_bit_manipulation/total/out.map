@@ -263,9 +263,9 @@ LOAD linker stubs
  .comment       0x0000000000000000       0x4d main.o
                                          0x4e (size before relaxing)
 
-.debug_info     0x0000000000000000       0xda
- .debug_info    0x0000000000000000       0xb4 main.o
- .debug_info    0x00000000000000b4       0x26 startup.o
+.debug_info     0x0000000000000000       0xcc
+ .debug_info    0x0000000000000000       0xa6 main.o
+ .debug_info    0x00000000000000a6       0x26 startup.o
 
 .debug_abbrev   0x0000000000000000       0x90
  .debug_abbrev  0x0000000000000000       0x7c main.o
@@ -288,10 +288,10 @@ LOAD linker stubs
  .debug_line    0x0000000000000000       0x79 main.o
  .debug_line    0x0000000000000079       0x3a startup.o
 
-.debug_str      0x0000000000000000     0x2d1c
- .debug_str     0x0000000000000000     0x2d04 main.o
- .debug_str     0x0000000000002d04       0x18 startup.o
-                                         0x63 (size before relaxing)
+.debug_str      0x0000000000000000     0x2d1e
+ .debug_str     0x0000000000000000     0x2d06 main.o
+ .debug_str     0x0000000000002d06       0x18 startup.o
+                                         0x65 (size before relaxing)
 
 .debug_frame    0x0000000000000000       0x58
  .debug_frame   0x0000000000000000       0x58 main.o
