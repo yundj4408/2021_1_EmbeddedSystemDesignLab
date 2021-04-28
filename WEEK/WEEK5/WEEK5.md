@@ -378,7 +378,7 @@ movs r3, #5		<- movs는 immediate value를 해당 destination register r3에 쓰
 
 arm에는 32,64bit architecture가 있다. 32bit 아키텍쳐는 legacy와 cortex로 나뉘는데 우리가 쓰는 아키텍처 버전은 ARMv7E-M, 즉 코어가 Cortex-M4이다. 현재 Thumb모드를 사용 중이다. 
 
-![movs](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK5/Pictures/movs.png)
+![movs](./Pictures/movs.png)
 
 
 

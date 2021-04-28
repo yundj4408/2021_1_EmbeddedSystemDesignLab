@@ -312,9 +312,9 @@ LOAD linker stubs
 .debug_line     0x0000000000000000      0x10f
  .debug_line    0x0000000000000000      0x10f main.o
 
-.debug_str      0x0000000000000000     0x32f3
- .debug_str     0x0000000000000000     0x32f3 main.o
-                                       0x3300 (size before relaxing)
+.debug_str      0x0000000000000000     0x32fa
+ .debug_str     0x0000000000000000     0x32fa main.o
+                                       0x3307 (size before relaxing)
 
 .debug_frame    0x0000000000000000       0x6c
  .debug_frame   0x0000000000000000       0x6c main.o
