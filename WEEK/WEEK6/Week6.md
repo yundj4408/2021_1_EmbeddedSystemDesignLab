@@ -27,8 +27,9 @@ int main()
 
 
 
-1. Main문 BreakPoint 설정 후 시작
-   ![1](./Pictures/1.png)
+1. #### Main문 BreakPoint 설정 후 시작
+
+   <img src="./Pictures/1.png" alt="1" style="zoom:50%;" />
 
    - `push {r7, lr}`
 
@@ -45,20 +46,81 @@ int main()
 
      
 
-2. 초기 stack 세팅
-   ![2](./Pictures/2.png)
+2. #### 초기 stack 세팅
+
+   <img src="./Pictures/2.png" alt="2" style="zoom:50%;" />
+
    - `ldr r2, [pc, #32]`
      - r2에 현재 PC값 + 32 한 값을 저장하였다. 
      - 왜?
    - `mov r3, r7`
      - mov를 한 이유는 레지스터의 개수가 충분하지 않으면 이렇게 data memory에 백업을 해야 된다.
        
-3. ldmia를 통해 레지스터에 값 저장 (use for popping data from Full Descending stacks)
-   ![3](./Pictures/3.png)
 
-4. stmia.w를 통해 레지스터에 있는 값을 Stack에 저장했다.
-   ![4](./Pictures/4.png)
-5. 
+3. #### ldmia를 통해 레지스터에 값 저장 (use for popping data from Full Descending stacks)
+
+   <img src="./Pictures/3.png" alt="3" style="zoom:50%;" />
+
+4. #### stmia.w를 통해 레지스터에 있는 값을 Stack에 저장했다.
+
+   <img src="./Pictures/4.png" alt="4" style="zoom:50%;" />
+
+5. #### Stack에 저장되어 있는 값들을 r3와 r2 레지스터에 저장하였다.
+
+   <img src="./Pictures/5.png" alt="5" style="zoom:50%;" />
+
+6. #### mov를 통해 레지스터 값 이동하였다.
+
+   <img src="./Pictures/6.png" alt="6" style="zoom:50%;" />
+
+7. #### BL를 통해 링크 레지스터의 값을 저장해놓고, add 함수로 jump 하였다.
+
+   <img src="./Pictures/7.png" alt="7" style="zoom:50%;" />
+
+   - **0x080001b5 :** str r0, [r7, #12] BL 다음 PC값을 lr에 저장하였다.
+   - **0x080001c4 : **
+
+8. #### sp 값을 빼주므로써 원래 쓰던 데이터를 사용하지 않고 sp를 빼주고, r7에 저장 해놓고 사용한다. 
+
+   <img src="./Pictures/8.png" alt="8" style="zoom:50%;" />
+
+9. #### str를 통해 mov 해놨던 r0, r1의 값을 stack에 불러와 저장하였다.
+
+   <img src="./Pictures/9.png" alt="9" style="zoom:50%;" />
+
+   
+
+10. #### ldr를 통해 전에 저장했던 stack에 불러와 다른 레지스터에 저장하여 연산을 한다. 레지스터 r0, r1의 값을 r2, r3로 넣어서 연산을 할 것이다. 
+
+    <img src="./Pictures/10.png" alt="10" style="zoom:50%;" />
+
+    
+
+11. #### 연산한 값을 레지스터 r3번에 저장한 후 stack에 다시 저장하였다. 저장하지 않는다면 레지스터의 값이 바뀌게 되면 함수에서 계산한 값이 사라진다. 
+
+    <img src="./Pictures/11.png" alt="11" style="zoom:50%;" />
+
+12. #### r3에 있는 값을 r0로 옮긴 후 r7이 fp 역할을 하고 있다. 그래서 fp 먼저 더하고, 그 값을 sp에넣으므로써 복구를 한다. 
+
+    <img src="./Pictures/12.png" alt="12" style="zoom:50%;" />
+
+13. 
+    <img src="./Pictures/13.png" alt="13" style="zoom:50%;" />
+
+14. #### 함수 연산하였던 값을 stack에 저장해주고 r3를 0으로 초기화 해줬다. 
+
+    <img src="./Pictures/14.png" alt="14" style="zoom:50%;" />
+
+    
+
+15. #### r3에 r0값을 넣은 후, fp값인 r7에 imm값 16를 추가하여 main문 sp값으로 복원 한다. 
+
+    <img src="./Pictures/15.png" alt="15" style="zoom:50%;" />
+
+16. #### pop {r7, pc}을 통해 sp를 복구 하였다. 
+
+    <img src="./Pictures/16.png" alt="16" style="zoom:50%;" />
+
 
 ## GPIO Blink Example
 
