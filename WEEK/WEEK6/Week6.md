@@ -1,12 +1,16 @@
 # Week6 : 함수 실행흐름 정리 및 polling 기반 GPIO, 입출력 처리 분석
 
+
+
 질문 
 
 1. port a가 input으로 설정을 했는데, 왜 output설정도 해주고 있는것인가?
 2. pull-up pull-down을 왜 설정을 안하는지?
 3. WEEK5와 WEEK6의 makefile이 다른데, week5같은 경우에는 linkerscript가 제대로 적용이 안된거 같은게 스택포인터 값 자체가 안바꼈다. 왜?
 
-​		
+
+
+## 배열 예제
 
 main.c
 
@@ -52,11 +56,10 @@ int main()
 
    - `ldr r2, [pc, #32]`
      - r2에 현재 PC값 + 32 한 값을 저장하였다. 
-     - 왜?
    - `mov r3, r7`
      - mov를 한 이유는 레지스터의 개수가 충분하지 않으면 이렇게 data memory에 백업을 해야 된다.
        
-
+   
 3. #### ldmia를 통해 레지스터에 값 저장 (use for popping data from Full Descending stacks)
 
    <img src="./Pictures/3.png" alt="3" style="zoom:50%;" />
@@ -78,8 +81,7 @@ int main()
    <img src="./Pictures/7.png" alt="7" style="zoom:50%;" />
 
    - **0x080001b5 :** str r0, [r7, #12] BL 다음 PC값을 lr에 저장하였다.
-   - **0x080001c4 : **
-
+   
 8. #### sp 값을 빼주므로써 원래 쓰던 데이터를 사용하지 않고 sp를 빼주고, r7에 저장 해놓고 사용한다. 
 
    <img src="./Pictures/8.png" alt="8" style="zoom:50%;" />
@@ -104,9 +106,10 @@ int main()
 
     <img src="./Pictures/12.png" alt="12" style="zoom:50%;" />
 
-13. 
-    <img src="./Pictures/13.png" alt="13" style="zoom:50%;" />
-
+13. #### Stack Pointer의 주소값에 #4에 있는 주소값을 r7에 load하였다.
+    
+<img src="./Pictures/13.png" alt="13" style="zoom:50%;" />
+    
 14. #### 함수 연산하였던 값을 stack에 저장해주고 r3를 0으로 초기화 해줬다. 
 
     <img src="./Pictures/14.png" alt="14" style="zoom:50%;" />
@@ -120,6 +123,7 @@ int main()
 16. #### pop {r7, pc}을 통해 sp를 복구 하였다. 
 
     <img src="./Pictures/16.png" alt="16" style="zoom:50%;" />
+    
 
 
 ## GPIO Blink Example
