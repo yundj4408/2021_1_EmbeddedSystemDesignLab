@@ -4,9 +4,9 @@
 
 질문 
 
-1. port a가 input으로 설정을 했는데, 왜 output설정도 해주고 있는것인가?
-2. pull-up pull-down을 왜 설정을 안하는지?
-3. WEEK5와 WEEK6의 makefile이 다른데, week5같은 경우에는 linkerscript가 제대로 적용이 안된거 같은게 스택포인터 값 자체가 안바꼈다. 왜?
+1. port a가 input으로 설정을 했는데, 왜 output설정도 해주고 있는것인가? 잘못 들어감
+2. pull-up pull-down을 왜 설정을 안하는지? 잘못 들어감
+3. WEEK5와 WEEK6의 makefile이 다른데, week5같은 경우에는 linkerscript가 제대로 적용이 안된거 같은게 스택포인터 값 자체가 안바꼈다. 왜? -> LinkerScript의 내용이 부족하여 Section objheader라는 코드 사용해보기.
 
 
 
@@ -108,6 +108,7 @@ int main()
 
 13. #### Stack Pointer의 주소값에 #4에 있는 주소값을 r7에 load하였다.
     
+
 <img src="./Pictures/13.png" alt="13" style="zoom:50%;" />
     
 14. #### 함수 연산하였던 값을 stack에 저장해주고 r3를 0으로 초기화 해줬다. 
