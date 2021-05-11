@@ -121,7 +121,6 @@ void EXTI0_IRQHandler() {
     GPIOD_ODR ^= 1 << 13;
     GPIOD_ODR ^= 1 << 14;
     GPIOD_ODR ^= 1 << 15;
-
     EXTI_PR |= 1<<0;    // clear pending bit for EXTI0
 }
 

@@ -3,6 +3,8 @@
 질문
 
 1. 왜 CR1, CR2를 설정하는 것인가? CR2에서는 
+2. NVIC_ISER1      |= 1<<6; , #define NVIC_ISER1 *(volatile unsigned *)0xE000E104
+3. 
 
 ### 1. 디버그(Debug)란?
 
@@ -359,16 +361,126 @@ void set_uart2() {
    (PAGE 285, **8.4.9 GPIO alternate function low register (GPIOx_AFRL) (x = A..I/J/K)**)
 
    `GPIOA_AFRL      |= (7<<8) | (7<<12)`
-   ![4](./Pictures/4.png)
+   <img src="./Pictures/4.png" alt="4" style="zoom:67%;" />
 
 5. USART Clock이 Sleep Mode일때도 Enable되게 하기 위해 1를 17번 shift해줬다.
    (PAGE 193, **6.3.18 RCC APB1 peripheral clock enable in low power mode register (RCC_APB1LPENR)**)
    `RCC_APB1ENR     |= (1<<17)`
 
-   ![5](./Pictures/5.png)
+   <img src="./Pictures/5.png" alt="5" style="zoom:67%;" />
 
 6.  USART의 Control Register Bit12번을 0으로 Setting함으로써 USART Data Bit 길이를 8bit로 설정하였다.
 
-   `USART2_CR1      |= (0<<12)`<img src="./Pictures/6.png" alt="6" style="zoom: 67%;" />
+   `USART2_CR1      |= (0<<12)`
+   <img src="./Pictures/6.png" alt="6" style="zoom: 67%;" />
+   
+   
+
+7. USART의 통신 속도를 지정하였다. 
+   `USART2_BRR      |= (unsigned int)(42000000/115200) `
+   <img src="./Pictures/7.png" alt="7" style="zoom:67%;" />
+
+   
+
+8. CR1(Control Register)의 Bit 2(Transmitter Enable), 3(Receiver Enable)를 1로 enable하여 수신과 송신을 가능하게 하였다.  Bit 5번 (RX Not Empty interrupt Enable)을 enable하여 버퍼에 값을 수신하면 RXNE는 1이 된다. Bit 13번을 1로 Enable 하여 USART를 Enable하였다. 
+
+   ```c
+   USART2_CR1      |= (1<<3) | (1<<2);     //TX,RX ENABLE
+   USART2_CR1      |= (1<<5);
+   USART2_CR1      |= (1<<13);
+   ```
+
+   <img src="./Pictures/8.png" alt="8" style="zoom:67%;" />
+
+9. STM32FDiscovery.h에 `#define NVIC_ISER1 *(volatile unsigned *)0xE000E104` 설정하였다. (이유). 
+   `NVIC_ISER1      |= 1<<6 `
+
+   <img src="./Pictures/9.png" alt="9" style="zoom: 50%;" />
+
+   ```c
+   void USART2_IRQHandler() 
+   {
+       if( USART2_SR & (1<<5) ) 
+       {
+           rec = USART2_DR;                //Data Register 
+          //after getting the input, we return the data to dr and print 
+           USART2_DR = rec;
+           while( !(USART2_SR & (1<<7)) );
+           while( !(USART2_SR & (1<<6)) );
+           GPIOD_ODR ^= 1<<12;              //To see the data is in
+   
+           USART2_CR1 |= (1<<5);           //After interrupt SR be 0 and we need to 		 turn the interrupt on
+       }
+   }
+   ```
+
+   
+
+10. USART2_CR1에서 RXNE USART Status Register에서 
+    `if( USART2_SR & (1<<5) )`
+
+    <img src="./Pictures/10.png" alt="10" style="zoom:67%;" />
+
+11. rec이라는 unsigned char를 만들어서 데이터를 8bit만큼 데이터 값을 받았다. 
+
+    ```c
+    rec = USART2_DR;   //Data Register 
+    USART2_DR = rec;   //after getting the input, we return the data to dr and print 
+    ```
+
+    <img src="./Pictures/11.png" alt="11" style="zoom:67%;" />
+
+12. d
+
+    ```c
+    while( !(USART2_SR & (1<<7)) );
+    while( !(USART2_SR & (1<<6)) );
+    GPIOD_ODR ^= 1<<12;              //To see the data is in
+    USART2_CR1 |= (1<<5);
+    ```
+
+    <img src="./Pictures/12.png" alt="12" style="zoom:67%;" />
+
+13. d
+
+    ```c
+    set_uart2();
+    while(count < 423)
+    {
+        USART2_DR = uart_data[count++];
+        while( !(USART2_SR & (1<<7)) );
+        while( !(USART2_SR & (1<<6)) );
+    }
+    ```
+
+    
+
+### 2. 구현 미션
+
+처음 해준 작업은 Makefile에 쉽게 serial monitoring하기 위해 명령어를 추가해줬다.
+
+```c
+serial:
+	gtkterm -p /dev/ttyUSB0 -s 115200
+```
 
 
+
+```
+/*********************************/
+/* LED CONTROL SHELL FOR STM32F4 */
+/*********************************/
+```
+
+1. 위에 있는 텍스트 문자를 ASCII코드로 변환하여 uart_data에 입력하였는데 에러가 떴다. 그래서 공백을 줄바꿈으로 바꿔 보겠다. 줄바꿈을 하여도 에러가 떴다. 
+   <img src="./Pictures/1_Error.png" alt="12" style="zoom:67%;" />
+
+
+
+2. 배열을 0으로 다 초기화했는데도 불구하고 이러한 에러가 발생하였다.  
+   <img src="./Pictures/2_Error.png" alt="12" style="zoom:67%;" />
+
+3. 확인해보니 main문에서의 `while(count < 숫자) `부분을 고치지 않았다. 멍청했다..
+   <img src="./Pictures/3_Printed.png" alt="12" style="zoom:67%;" />
+
+4. help라는 명령어를 치면 메뉴얼이 나올 수 있게 만들었다. 
