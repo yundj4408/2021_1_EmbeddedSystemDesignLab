@@ -24,11 +24,23 @@ out.bin: out.elf
 size: out.elf
 	$(SIZE) $< 
 
+ocd: 
+	openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg
+
+flash:
+	openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -c "program out.elf verify reset exit"
+
 qemu: 
 	qemu-system-gnuarmeclipse -cpu cortex-m4 -machine STM32F4-Discovery -gdb tcp::3333 -kernel out.elf
 
 gdb:
 	./run_gdb.sh
 
+gdb_openocd:
+	./run_gdb_ocd.sh
+
 clean:
 	rm *.o *.d *.elf *.bin *.map
+
+serial:
+	gtkterm -p /dev/ttyUSB0 -s 115200

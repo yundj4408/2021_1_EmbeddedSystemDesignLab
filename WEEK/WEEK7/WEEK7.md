@@ -449,7 +449,7 @@ void set_uart2() {
 
     <img src="./Pictures/12.png" alt="12" style="zoom:67%;" />
 
-13. 
+13. main문에서 위에서 선언한 set_uart2()를 불러옴으로써 USART2의 기본 세팅을 완료하였고, while문을 통해 uart_data[count]에 있는 데이터들을 USART2_DR에 넣어주고 Serial Monitor에 출력되게 만들었다.
 
     ```c
     set_uart2();

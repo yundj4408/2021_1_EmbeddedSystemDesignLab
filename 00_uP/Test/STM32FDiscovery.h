@@ -169,8 +169,8 @@ typedef volatile struct{
 #define SYSCFG_PMC      (SYSCFG->rPMC)
 #define SYSCFG_EXTICR1  (SYSCFG->rEXTICR1)
 #define SYSCFG_EXTICR2  (SYSCFG->rEXTICR2)
-#define SYSCFG_EXTICR1  (SYSCFG->rEXTICR3)
-#define SYSCFG_EXTICR1  (SYSCFG->rEXTICR4)
+#define SYSCFG_EXTICR3  (SYSCFG->rEXTICR3)
+#define SYSCFG_EXTICR4  (SYSCFG->rEXTICR4)
 #define SYSCFG_CMPCR    (SYSCFG->rCMPCR)
 
 // EXTI register //
@@ -187,3 +187,4 @@ typedef volatile struct{
 
 #define FLASH_ACR *(volatile unsigned *)0x40023C00
 #define NVIC_ISER0 *(volatile unsigned *)0xE000E100
+#define NVIC_ISER1 *(volatile unsigned *)0xE000E104     //because USART interrupt position is on 38, so we add 4

@@ -142,7 +142,6 @@ g_pfnVectors:
 	.word	0
 	.word	0
 	.word	0
-	.word	TIM2_IRQHandler
 	.word	0
 	.word	0
 	.word	0
@@ -153,6 +152,7 @@ g_pfnVectors:
 	.word	0
 	.word	0
 	.word	0
+	.word	USART2_IRQHandler
 	.word	0
 	.word	0
 	.word	0

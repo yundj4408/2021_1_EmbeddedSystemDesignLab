@@ -1,10 +1,17 @@
 #include "STM32FDiscovery.h"
 
 unsigned char rec;
-unsigned char temp;
+unsigned int i = 0;
+unsigned int j = 0;
+unsigned int k = 0;
 
 unsigned int count = 0;
-unsigned int uart_data[109]= {
+unsigned int temp[12] = {0};
+unsigned int temp_count = 0;
+unsigned count_two = 0;
+unsigned count_third = 0;
+
+unsigned int uart_data[111]= {
 47, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
@@ -15,9 +22,25 @@ unsigned int uart_data[109]= {
 47, 10, 47, 42, 42, 42, 42, 42, 42, 42, 
 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
-42, 42, 42, 42, 42, 42, 47, 10, 62};
+42, 42, 42, 42, 42, 42, 47, 10, 62, 62,
+32};
 
-unsigned int help[4] = {103, 111, 111, 100};
+unsigned int help[116] = {
+42, 32, 67, 111, 109, 109, 97, 110, 100, 32,
+76, 105, 115, 116, 32, 10, 32, 32, 32, 45, 
+32, 76, 69, 68, 79, 78, 10, 32, 32, 32, 
+32, 32, 32, 32, 32, 32, 32, 32, 43, 32, 
+32, 32, 97, 114, 103, 117, 109, 101, 110, 116,
+32, 91, 49, 44, 32, 50, 44, 32, 51, 44, 
+32, 52, 93, 10, 32, 32, 32, 45, 32, 76,
+69, 68, 79, 70, 70, 10, 32, 32, 32, 32, 
+32, 32, 32, 32, 32, 32, 32, 43, 32, 32, 
+32, 97, 114, 103, 117, 109, 101, 110, 116, 32, 
+91, 49, 44, 32, 50, 44, 32, 51, 44, 32, 
+52, 93, 10, 62, 62, 32};
+
+unsigned int bash[4] = {10, 62, 62, 32};
+
 
 void clk(void)
 {
@@ -27,7 +50,6 @@ void clk(void)
 		
 	RCC_CR |= (1<<16); // HSE set
 	while( (RCC_CR & ( 1<<17) ) == 0 ); // wait until HSE ready
-	
 	RCC_PLLCFGR |= 8;//0x00000008; // set PLLM
 	RCC_PLLCFGR |= (336<<6);//|= (336<<6); // 		set PLLN
 	RCC_PLLCFGR |= (0<<16); // set PLLP
@@ -74,13 +96,16 @@ void set_uart2() {
 void USART2_IRQHandler() {
     if( USART2_SR & (1<<5) ) 
     {
-        temp = USART2_DR;
         rec = USART2_DR;                //Data Register 
        //after getting the input, we return the data to dr and print 
         USART2_DR = rec;
+        
+        temp[temp_count] = rec;          //save data to global variable
+        temp_count++;
         while( !(USART2_SR & (1<<7)) );
         while( !(USART2_SR & (1<<6)) );
-        GPIOD_ODR ^= 1<<12;              //To see the data is in
+        //GPIOD_ODR ^= 1<<12;            //To see the data is in
+
         USART2_CR1 |= (1<<5);           //After interrupt SR be 0 and we need to turn the interrupt on
 
     }
@@ -94,6 +119,190 @@ void EXTI0_IRQHandler() {
     EXTI_PR |= 1<<0;    // clear pending bit for EXTI0
 }
 
+
+void Receive(void){
+
+    for (i=0; i<12; i++) 
+    {
+        if((temp[i] == 104) && (temp[i+1] == 101) && (temp[i+2] == 108) && (temp[i+3] == 112))
+        {                                       //HELP function
+            for (j=0; j<5; j++)         
+            {
+                if(temp[j] == 13)               // /r = ascii code 13 
+                {
+                    while (count_two < 116)
+                    {
+                        USART2_DR = help[count_two++];
+                        while(!(USART2_SR & (1<<7)) );
+                        while(!(USART2_SR & (1<<6)) );
+                    }
+                    for (k=0; k<12; k++)
+                    {
+                        temp[k] = 0;                  //After printing help guide, empty temp
+                    }
+                    temp_count = 0;                   //to reset the temp_count 
+                }
+            }
+        }
+
+
+
+
+        else if((temp[i] == 76) && (temp[i+1] == 69) && (temp[i+2] == 68) && (temp[i+3] == 79) && (temp[i+4] == 78) && temp[i+5] == 32)                                     //LEDON Function
+        {
+            if (temp[i+7] == 13)
+            {
+            
+                if(temp[i+6] == 49)
+                {
+                    GPIOD_ODR |= 1 << 12;
+                    while (count_third < 4)
+                    {
+                        USART2_DR = bash[count_third++];
+                        while(!(USART2_SR & (1<<7)) );
+                        while(!(USART2_SR & (1<<6)) ); 
+                    } 
+                    for (k=0; k<12; k++)
+                    {
+                        temp[k] = 0;                  //After printing help guide, empty temp
+                    }
+                    count_third = 0;
+                    temp_count = 0;                   //to reset the temp_count 
+                }
+
+                else if (temp[i+6] == 50)
+                {
+                    GPIOD_ODR |= 1 << 13;
+
+                    while (count_third < 4)
+                    {
+                        USART2_DR = bash[count_third++];
+                        while(!(USART2_SR & (1<<7)) );
+                        while(!(USART2_SR & (1<<6)) ); 
+                    } 
+                    for (k=0; k<12; k++)
+                    {
+                        temp[k] = 0;                  //After printing help guide, empty temp
+                    }
+                    count_third = 0;
+                    temp_count = 0;                   //to reset the temp_count 
+                }
+
+                else if (temp[i+6] == 51)
+                {
+                    GPIOD_ODR |= 1 << 14;
+
+                    while (count_third < 4)
+                    {
+                        USART2_DR = bash[count_third++];
+                        while(!(USART2_SR & (1<<7)) );
+                        while(!(USART2_SR & (1<<6)) ); 
+                    } 
+                    for (k=0; k<12; k++)
+                    {
+                        temp[k] = 0;                  //After printing help guide, empty temp
+                    }
+                    count_third = 0;
+                    temp_count = 0;                   //to reset the temp_count 
+                }
+                else if (temp[i+6] == 52)
+                {
+                    GPIOD_ODR |= 1 << 15;
+
+                    while (count_third < 4)
+                    {
+                        USART2_DR = bash[count_third++];
+                        while(!(USART2_SR & (1<<7)) );
+                        while(!(USART2_SR & (1<<6)) ); 
+                    } 
+                    for (k=0; k<12; k++)
+                    {
+                        temp[k] = 0;                  //After printing help guide, empty temp
+                    }
+                    count_third = 0;
+                    temp_count = 0;                   //to reset the temp_count 
+                }
+            }
+        }
+
+        else if((temp[i] == 76) && (temp[i+1] == 69) && (temp[i+2] == 68) && (temp[i+3] == 79) && (temp[i+4] == 70) && temp[i+5] == 70 && temp[i+6] == 32)                                     //LEDOFF Function
+        {
+            if (temp[i+8] == 13)
+            {
+            
+                if(temp[i+7] == 49)
+                {
+                    GPIOD_ODR &= ~(1 << 12);
+                    while (count_third < 4)
+                    {
+                        USART2_DR = bash[count_third++];
+                        while(!(USART2_SR & (1<<7)) );
+                        while(!(USART2_SR & (1<<6)) ); 
+                    } 
+                    for (k=0; k<12; k++)
+                    {
+                        temp[k] = 0;                  //After printing help guide, empty temp
+                    }
+                    count_third = 0;
+                    temp_count = 0;                   //to reset the temp_count 
+                }
+
+                else if (temp[i+7] == 50)
+                {
+                    GPIOD_ODR &= ~(1 << 13);
+
+                    while (count_third < 4)
+                    {
+                        USART2_DR = bash[count_third++];
+                        while(!(USART2_SR & (1<<7)) );
+                        while(!(USART2_SR & (1<<6)) ); 
+                    } 
+                    for (k=0; k<12; k++)
+                    {
+                        temp[k] = 0;                  //After printing help guide, empty temp
+                    }
+                    count_third = 0;
+                    temp_count = 0;                   //to reset the temp_count 
+                }
+
+                else if (temp[i+7] == 51)
+                {
+                    GPIOD_ODR &= ~(1 << 14);
+
+                    while (count_third < 4)
+                    {
+                        USART2_DR = bash[count_third++];
+                        while(!(USART2_SR & (1<<7)) );
+                        while(!(USART2_SR & (1<<6)) ); 
+                    } 
+                    for (k=0; k<12; k++)
+                    {
+                        temp[k] = 0;                  //After printing help guide, empty temp
+                    }
+                    count_third = 0;
+                    temp_count = 0;                   //to reset the temp_count 
+                }
+                else if (temp[i+7] == 52)
+                {
+                    GPIOD_ODR &= ~(1 << 15);
+
+                    while (count_third < 4)
+                    {
+                        USART2_DR = bash[count_third++];
+                        while(!(USART2_SR & (1<<7)) );
+                        while(!(USART2_SR & (1<<6)) ); 
+                    } 
+                    for (k=0; k<12; k++)
+                    {
+                        temp[k] = 0;                  //After printing help guide, empty temp
+                    }
+                    count_third = 0;
+                    temp_count = 0;                   //to reset the temp_count 
+                }
+            }
+        }
+    }
+}
 
 int main (void)
 {
@@ -124,31 +333,19 @@ int main (void)
 	GPIOD_OTYPER |= 0x00000000;
 	GPIOD_PUPDR	 |= 0x00000000;
 	
-	GPIOD_ODR |= 1<<12;
+	//GPIOD_ODR |= 1<<12;
 
     set_uart2();
-    while(count < 109)
+    while(count < 111)
     {
         USART2_DR = uart_data[count++];
         while( !(USART2_SR & (1<<7)) );
         while( !(USART2_SR & (1<<6)) );
-    } //1byte send, when
-    
+    }                                   //1byte send, when 
+
 	while(1) 
     {
-        if((temp & 0x00FF) == 0x000a)
-        {
-            while(count < 4)
-            {
-                USART2_DR = help[count++];
-                while( !(USART2_SR & (1<<7)) );
-                while( !(USART2_SR & (1<<6)) );
-            }
-        }
-    }
-//        if( GPIOA_IDR & 0x00000001 ) {
-//            GPIOD_ODR ^= 1 << 13;
-//           GPIOD_ODR ^= 1 << 14;
-//            GPIOD_ODR ^= 1 << 15;
-//        }
+        Receive();
+	}
 }
+

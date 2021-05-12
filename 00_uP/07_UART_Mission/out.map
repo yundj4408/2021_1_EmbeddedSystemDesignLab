@@ -200,7 +200,7 @@ LOAD /home/dongjun/Downloads/gcc-arm-none-eabi-10-2020-q4-major/bin/../lib/gcc/a
                 0x0000000008000000                g_pfnVectors
                 0x0000000008000188                . = ALIGN (0x4)
 
-.text           0x0000000008000188      0x400
+.text           0x0000000008000188      0xa78
                 0x0000000008000188                . = ALIGN (0x4)
  *(.text)
  *(.text*)
@@ -210,79 +210,88 @@ LOAD /home/dongjun/Downloads/gcc-arm-none-eabi-10-2020-q4-major/bin/../lib/gcc/a
                 0x000000000800025c       0x9c main.o
                 0x000000000800025c                set_uart2
  .text.USART2_IRQHandler
-                0x00000000080002f8       0x7c main.o
+                0x00000000080002f8       0x80 main.o
                 0x00000000080002f8                USART2_IRQHandler
  .text.EXTI0_IRQHandler
-                0x0000000008000374       0x48 main.o
-                0x0000000008000374                EXTI0_IRQHandler
- .text.main     0x00000000080003bc      0x174 main.o
-                0x00000000080003bc                main
+                0x0000000008000378       0x48 main.o
+                0x0000000008000378                EXTI0_IRQHandler
+ .text.Receive  0x00000000080003c0      0x6c8 main.o
+                0x00000000080003c0                Receive
+ .text.main     0x0000000008000a88      0x120 main.o
+                0x0000000008000a88                main
  .text.Reset_Handler
-                0x0000000008000530       0x40 startup.o
-                0x0000000008000530                Reset_Handler
+                0x0000000008000ba8       0x40 startup.o
+                0x0000000008000ba8                Reset_Handler
  *(.glue_7)
- .glue_7        0x0000000008000570        0x0 linker stubs
+ .glue_7        0x0000000008000be8        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x0000000008000570        0x0 linker stubs
+ .glue_7t       0x0000000008000be8        0x0 linker stubs
  *(.eh_frame)
  *(.init)
- .init          0x0000000008000570        0x4 /home/dongjun/Downloads/gcc-arm-none-eabi-10-2020-q4-major/bin/../lib/gcc/arm-none-eabi/10.2.1/thumb/v7e-m+fp/hard/crti.o
-                0x0000000008000570                _init
- .init          0x0000000008000574        0x8 /home/dongjun/Downloads/gcc-arm-none-eabi-10-2020-q4-major/bin/../lib/gcc/arm-none-eabi/10.2.1/thumb/v7e-m+fp/hard/crtn.o
+ .init          0x0000000008000be8        0x4 /home/dongjun/Downloads/gcc-arm-none-eabi-10-2020-q4-major/bin/../lib/gcc/arm-none-eabi/10.2.1/thumb/v7e-m+fp/hard/crti.o
+                0x0000000008000be8                _init
+ .init          0x0000000008000bec        0x8 /home/dongjun/Downloads/gcc-arm-none-eabi-10-2020-q4-major/bin/../lib/gcc/arm-none-eabi/10.2.1/thumb/v7e-m+fp/hard/crtn.o
  *(.fini)
- .fini          0x000000000800057c        0x4 /home/dongjun/Downloads/gcc-arm-none-eabi-10-2020-q4-major/bin/../lib/gcc/arm-none-eabi/10.2.1/thumb/v7e-m+fp/hard/crti.o
-                0x000000000800057c                _fini
- .fini          0x0000000008000580        0x8 /home/dongjun/Downloads/gcc-arm-none-eabi-10-2020-q4-major/bin/../lib/gcc/arm-none-eabi/10.2.1/thumb/v7e-m+fp/hard/crtn.o
-                0x0000000008000588                . = ALIGN (0x4)
-                0x0000000008000588                _etext = .
+ .fini          0x0000000008000bf4        0x4 /home/dongjun/Downloads/gcc-arm-none-eabi-10-2020-q4-major/bin/../lib/gcc/arm-none-eabi/10.2.1/thumb/v7e-m+fp/hard/crti.o
+                0x0000000008000bf4                _fini
+ .fini          0x0000000008000bf8        0x8 /home/dongjun/Downloads/gcc-arm-none-eabi-10-2020-q4-major/bin/../lib/gcc/arm-none-eabi/10.2.1/thumb/v7e-m+fp/hard/crtn.o
+                0x0000000008000c00                . = ALIGN (0x4)
+                0x0000000008000c00                _etext = .
 
-.vfp11_veneer   0x0000000008000588        0x0
- .vfp11_veneer  0x0000000008000588        0x0 linker stubs
+.vfp11_veneer   0x0000000008000c00        0x0
+ .vfp11_veneer  0x0000000008000c00        0x0 linker stubs
 
-.v4_bx          0x0000000008000588        0x0
- .v4_bx         0x0000000008000588        0x0 linker stubs
+.v4_bx          0x0000000008000c00        0x0
+ .v4_bx         0x0000000008000c00        0x0 linker stubs
 
-.iplt           0x0000000008000588        0x0
- .iplt          0x0000000008000588        0x0 main.o
+.iplt           0x0000000008000c00        0x0
+ .iplt          0x0000000008000c00        0x0 main.o
 
-.rel.dyn        0x0000000008000588        0x0
- .rel.iplt      0x0000000008000588        0x0 main.o
+.rel.dyn        0x0000000008000c00        0x0
+ .rel.iplt      0x0000000008000c00        0x0 main.o
 
-.rodata         0x0000000008000588        0x0
-                0x0000000008000588                . = ALIGN (0x4)
+.rodata         0x0000000008000c00        0x0
+                0x0000000008000c00                . = ALIGN (0x4)
  *(.rodata)
  *(.rodata*)
-                0x0000000008000588                . = ALIGN (0x4)
-                0x0000000008000588                _sidata = LOADADDR (.data)
+                0x0000000008000c00                . = ALIGN (0x4)
+                0x0000000008000c00                _sidata = LOADADDR (.data)
 
-.data           0x0000000020000000      0x1c4 load address 0x0000000008000588
+.data           0x0000000020000000      0x39c load address 0x0000000008000c00
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                _sdata = .
  *(.data)
- .data          0x0000000020000000      0x1c4 main.o
+ .data          0x0000000020000000      0x39c main.o
                 0x0000000020000000                uart_data
-                0x00000000200001b4                help
+                0x00000000200001bc                help
+                0x000000002000038c                bash
  *(.data*)
-                0x00000000200001c4                . = ALIGN (0x4)
-                0x00000000200001c4                _edata = .
+                0x000000002000039c                . = ALIGN (0x4)
+                0x000000002000039c                _edata = .
 
-.igot.plt       0x00000000200001c4        0x0 load address 0x000000000800074c
- .igot.plt      0x00000000200001c4        0x0 main.o
-                0x00000000200001c4                . = ALIGN (0x4)
+.igot.plt       0x000000002000039c        0x0 load address 0x0000000008000f9c
+ .igot.plt      0x000000002000039c        0x0 main.o
+                0x000000002000039c                . = ALIGN (0x4)
 
-.bss            0x00000000200001c4        0x8 load address 0x000000000800074c
-                0x00000000200001c4                _sbss = .
-                0x00000000200001c4                __bss_start__ = _sbss
+.bss            0x000000002000039c       0x50 load address 0x0000000008000f9c
+                0x000000002000039c                _sbss = .
+                0x000000002000039c                __bss_start__ = _sbss
  *(.bss)
- .bss           0x00000000200001c4        0x8 main.o
-                0x00000000200001c4                rec
-                0x00000000200001c5                temp
-                0x00000000200001c8                count
+ .bss           0x000000002000039c       0x50 main.o
+                0x000000002000039c                rec
+                0x00000000200003a0                i
+                0x00000000200003a4                j
+                0x00000000200003a8                k
+                0x00000000200003ac                count
+                0x00000000200003b0                temp
+                0x00000000200003e0                temp_count
+                0x00000000200003e4                count_two
+                0x00000000200003e8                count_third
  *(.bss*)
  *(COMMON)
-                0x00000000200001cc                . = ALIGN (0x4)
-                0x00000000200001cc                _ebss = .
-                0x00000000200001cc                __bss_end__ = _ebss
+                0x00000000200003ec                . = ALIGN (0x4)
+                0x00000000200003ec                _ebss = .
+                0x00000000200003ec                __bss_end__ = _ebss
 OUTPUT(out.elf elf32-littlearm)
 LOAD linker stubs
 
@@ -301,30 +310,30 @@ LOAD linker stubs
  .comment       0x0000000000000000       0x4d main.o
                                          0x4e (size before relaxing)
 
-.debug_info     0x0000000000000000      0x401
- .debug_info    0x0000000000000000      0x401 main.o
+.debug_info     0x0000000000000000      0x4ac
+ .debug_info    0x0000000000000000      0x4ac main.o
 
-.debug_abbrev   0x0000000000000000       0xfa
- .debug_abbrev  0x0000000000000000       0xfa main.o
+.debug_abbrev   0x0000000000000000      0x114
+ .debug_abbrev  0x0000000000000000      0x114 main.o
 
-.debug_aranges  0x0000000000000000       0x40
+.debug_aranges  0x0000000000000000       0x48
  .debug_aranges
-                0x0000000000000000       0x40 main.o
+                0x0000000000000000       0x48 main.o
 
-.debug_ranges   0x0000000000000000       0x30
- .debug_ranges  0x0000000000000000       0x30 main.o
+.debug_ranges   0x0000000000000000       0x38
+ .debug_ranges  0x0000000000000000       0x38 main.o
 
 .debug_macro    0x0000000000000000      0xc62
  .debug_macro   0x0000000000000000       0x1a main.o
  .debug_macro   0x000000000000001a      0xa90 main.o
  .debug_macro   0x0000000000000aaa      0x1b8 main.o
 
-.debug_line     0x0000000000000000      0x22d
- .debug_line    0x0000000000000000      0x22d main.o
+.debug_line     0x0000000000000000      0x800
+ .debug_line    0x0000000000000000      0x800 main.o
 
-.debug_str      0x0000000000000000     0x35c2
- .debug_str     0x0000000000000000     0x35c2 main.o
-                                       0x35dd (size before relaxing)
+.debug_str      0x0000000000000000     0x35ea
+ .debug_str     0x0000000000000000     0x35ea main.o
+                                       0x360b (size before relaxing)
 
-.debug_frame    0x0000000000000000       0xac
- .debug_frame   0x0000000000000000       0xac main.o
+.debug_frame    0x0000000000000000       0xd0
+ .debug_frame   0x0000000000000000       0xd0 main.o
