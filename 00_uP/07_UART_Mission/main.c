@@ -1,8 +1,9 @@
 #include "STM32FDiscovery.h"
 
 unsigned char rec;
-unsigned int count = 0;
+unsigned char temp;
 
+unsigned int count = 0;
 unsigned int uart_data[109]= {
 47, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
@@ -15,6 +16,8 @@ unsigned int uart_data[109]= {
 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
 42, 42, 42, 42, 42, 42, 47, 10, 62};
+
+unsigned int help[4] = {103, 111, 111, 100};
 
 void clk(void)
 {
@@ -71,6 +74,7 @@ void set_uart2() {
 void USART2_IRQHandler() {
     if( USART2_SR & (1<<5) ) 
     {
+        temp = USART2_DR;
         rec = USART2_DR;                //Data Register 
        //after getting the input, we return the data to dr and print 
         USART2_DR = rec;
@@ -128,14 +132,23 @@ int main (void)
         USART2_DR = uart_data[count++];
         while( !(USART2_SR & (1<<7)) );
         while( !(USART2_SR & (1<<6)) );
-    }                                   //1byte send, when 
-
+    } //1byte send, when
+    
 	while(1) 
     {
+        if((temp & 0x00FF) == 0x000a)
+        {
+            while(count < 4)
+            {
+                USART2_DR = help[count++];
+                while( !(USART2_SR & (1<<7)) );
+                while( !(USART2_SR & (1<<6)) );
+            }
+        }
+    }
 //        if( GPIOA_IDR & 0x00000001 ) {
 //            GPIOD_ODR ^= 1 << 13;
 //           GPIOD_ODR ^= 1 << 14;
 //            GPIOD_ODR ^= 1 << 15;
 //        }
-	}
 }

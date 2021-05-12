@@ -416,12 +416,19 @@ void set_uart2() {
 
    
 
-10. USART2_CR1에서 RXNE USART Status Register에서 
+10. USART2_SR의 5번 bit RXNE가 1이 된다면 data가 읽는 준비가 되었다는 것이다. 
     `if( USART2_SR & (1<<5) )`
 
     <img src="./Pictures/10.png" alt="10" style="zoom:67%;" />
 
-11. rec이라는 unsigned char를 만들어서 데이터를 8bit만큼 데이터 값을 받았다. 
+11. data를 읽을 준비가 되어서 rec이라는 unsigned char를 만들어서(stack공간)
+    USART2_DR[8:0], 8bit만큼 데이터 값을 받았다. 
+    데이터시트를 참고하면 USART2_SR 비트 5번이 바로 0이 된다. 
+    "It is  cleared by a read to the USART_DR register" 
+    5번이 0이 되서 USART2_DR의 데이터 값이 사라진다????????
+    사라진 DR의 데이터값을 다시 USART2_DR에 넣어 주고,
+
+    
 
     ```c
     rec = USART2_DR;   //Data Register 
@@ -430,7 +437,8 @@ void set_uart2() {
 
     <img src="./Pictures/11.png" alt="11" style="zoom:67%;" />
 
-12. d
+12. USART2_SR의 Bit 7번과 6번은 데이터 전송이 완료되면 1이 되면서 무한루프를 나가게 된다.
+     LED를 XOR를 통해 데이터를 송신할때 마다 껐다켰다 한다. 
 
     ```c
     while( !(USART2_SR & (1<<7)) );
@@ -441,7 +449,7 @@ void set_uart2() {
 
     <img src="./Pictures/12.png" alt="12" style="zoom:67%;" />
 
-13. d
+13. 
 
     ```c
     set_uart2();
