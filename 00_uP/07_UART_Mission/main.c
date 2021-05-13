@@ -4,6 +4,9 @@ unsigned char rec;
 unsigned int i = 0;
 unsigned int j = 0;
 unsigned int k = 0;
+unsigned int loop;
+unsigned int loop_in;
+
 
 unsigned int count = 0;
 unsigned int temp[12] = {0};
@@ -25,7 +28,7 @@ unsigned int uart_data[111]= {
 42, 42, 42, 42, 42, 42, 47, 10, 62, 62,
 32};
 
-unsigned int help[116] = {
+unsigned int help[178] = {
 42, 32, 67, 111, 109, 109, 97, 110, 100, 32,
 76, 105, 115, 116, 32, 10, 32, 32, 32, 45, 
 32, 76, 69, 68, 79, 78, 10, 32, 32, 32, 
@@ -37,7 +40,13 @@ unsigned int help[116] = {
 32, 32, 32, 32, 32, 32, 32, 43, 32, 32, 
 32, 97, 114, 103, 117, 109, 101, 110, 116, 32, 
 91, 49, 44, 32, 50, 44, 32, 51, 44, 32, 
-52, 93, 10, 62, 62, 32};
+52, 93, 10, 32, 32, 32, 45, 32, 76, 69, 
+68, 79, 78, 32, 65, 76, 76, 10, 32, 
+32, 32, 45, 32, 76, 69, 68, 79, 70, 70, 
+32, 65, 76, 76, 10, 32, 32, 32, 45, 32, 76, 
+69, 68, 79, 78, 32, 83, 69, 81, 10, 
+32, 32, 32, 45, 32, 76, 69, 68, 79, 70, 70, 
+32, 83, 69, 81, 10, 62, 62, 32};
 
 unsigned int bash[4] = {10, 62, 62, 32};
 
@@ -119,6 +128,12 @@ void EXTI0_IRQHandler() {
     EXTI_PR |= 1<<0;    // clear pending bit for EXTI0
 }
 
+void Delay() {
+    for(loop=0; loop<1000000; loop++)
+    {
+        while(loop_in < 1000000) {loop_in++;}
+    }
+}
 
 void Receive(void){
 
@@ -130,7 +145,7 @@ void Receive(void){
             {
                 if(temp[j] == 13)               // /r = ascii code 13 
                 {
-                    while (count_two < 116)
+                    while (count_two < 178)
                     {
                         USART2_DR = help[count_two++];
                         while(!(USART2_SR & (1<<7)) );
@@ -223,7 +238,57 @@ void Receive(void){
                     temp_count = 0;                   //to reset the temp_count 
                 }
             }
-        }
+
+            else if (temp[i+9] == 13)
+            {
+                if ((temp[i+6] == 65) && (temp[i+7] == 76) && (temp[i+8] == 76))
+                { 
+                    GPIOD_ODR |= 1 << 12;
+                    GPIOD_ODR |= 1 << 13;
+                    GPIOD_ODR |= 1 << 14;
+                    GPIOD_ODR |= 1 << 15;
+
+                    while (count_third < 4)
+                    {
+                        USART2_DR = bash[count_third++];
+                        while(!(USART2_SR & (1<<7)) );
+                        while(!(USART2_SR & (1<<6)) ); 
+                    } 
+                    for (k=0; k<12; k++)
+                    {
+                        temp[k] = 0;                  //After printing help guide, empty temp
+                    }
+                    count_third = 0;
+                    temp_count = 0;                   //to reset the temp_count  
+                }
+
+                else if ((temp[i+6] == 83) && (temp[i+7] == 69) && (temp[i+8] == 81))   //LEDON SEQ
+                {
+
+                    GPIOD_ODR |= 1 << 12;
+                    Delay();
+                    GPIOD_ODR |= 1 << 13;
+                    Delay();
+                    GPIOD_ODR |= 1 << 14;
+                    Delay();
+                    GPIOD_ODR |= 1 << 15;
+                    Delay();
+
+                    while (count_third < 4)
+                    {
+                        USART2_DR = bash[count_third++];
+                        while(!(USART2_SR & (1<<7)) );
+                        while(!(USART2_SR & (1<<6)) ); 
+                    } 
+                    for (k=0; k<12; k++)
+                    {
+                        temp[k] = 0;                  //After printing help guide, empty temp
+                    }
+                    count_third = 0;
+                    temp_count = 0;                   //to reset the temp_count  
+                }
+            }
+        }    
 
         else if((temp[i] == 76) && (temp[i+1] == 69) && (temp[i+2] == 68) && (temp[i+3] == 79) && (temp[i+4] == 70) && temp[i+5] == 70 && temp[i+6] == 32)                                     //LEDOFF Function
         {
@@ -300,6 +365,59 @@ void Receive(void){
                     temp_count = 0;                   //to reset the temp_count 
                 }
             }
+        
+      
+            else if (temp[i+10] == 13)                //LEDOFF ALL
+            {
+                GPIOD_ODR |= 1<<12;
+                if ((temp[i+7] == 65) && (temp[i+8] == 76) && (temp[i+9] == 76))
+                {
+                    GPIOD_ODR &= ~(1 << 12);
+                    GPIOD_ODR &= ~(1 << 13);
+                    GPIOD_ODR &= ~(1 << 14);
+                    GPIOD_ODR &= ~(1 << 15);
+
+                    while (count_third < 4)
+                    {
+                        USART2_DR = bash[count_third++];
+                        while(!(USART2_SR & (1<<7)) );
+                        while(!(USART2_SR & (1<<6)) ); 
+                    } 
+                    for (k=0; k<12; k++)
+                    {
+                        temp[k] = 0;                  //After printing help guide, empty temp
+                    }
+                    count_third = 0;
+                    temp_count = 0;                   //to reset the temp_count  
+                }
+
+                else if ((temp[i+7] == 83) && (temp[i+8] == 69) && (temp[i+9] == 81))   //LEDOFF SEQ
+                {
+
+                    GPIOD_ODR &= ~(1 << 12);
+                    Delay();
+                    GPIOD_ODR &= ~(1 << 13);
+                    Delay();
+                    GPIOD_ODR &= ~(1 << 14);
+                    Delay();
+                    GPIOD_ODR &= ~(1 << 15);
+                    Delay();
+
+                    while (count_third < 4)
+                    {
+                        USART2_DR = bash[count_third++];
+                        while(!(USART2_SR & (1<<7)) );
+                        while(!(USART2_SR & (1<<6)) ); 
+                    } 
+                    for (k=0; k<12; k++)
+                    {
+                        temp[k] = 0;                  //After printing help guide, empty temp
+                    }
+                    count_third = 0;
+                    temp_count = 0;                   //to reset the temp_count  
+                }
+                
+           }    
         }
     }
 }

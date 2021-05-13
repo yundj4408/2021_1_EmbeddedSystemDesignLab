@@ -13,7 +13,7 @@ CFLAGS += -DDEBUG -DSTM32F411xE -DUSE_STDPERIPH_DRIVER -O0 -g3 -Wall -fmessage-l
 LFLAGS = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T"LinkerScript.ld" -Wl,-Map=out.map -Wl,--gc-sections
 
 ## Rules
-all: out.elf out.bin size 
+all: out.elf out.bin size flash serial 
 
 out.elf: $(OBJS) LinkerScript.ld
 	$(LD) $(LFLAGS) -o out.elf $(OBJS)
