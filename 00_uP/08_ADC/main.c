@@ -1,12 +1,12 @@
 #include "STM32FDiscovery.h"
-#include <stdio.h>
 
 unsigned char adc_val;
 unsigned char rec;
 unsigned int count = 0;
-
+unsigned int i, a, b, c;
 char buf[5];        //Space for ADC string
 unsigned int len;   //Space for ADC string len
+
 
 unsigned int uart_data[423]= {
 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 
@@ -148,7 +148,29 @@ void ADC1_IRQHandler() {
     if(ADC1_SR & 1<<1){
         adc_val = ADC1_DR & 0xFF;
 
-        len = sprintf(buf, "%3d\n", adc_val);
+        if(adc_val > 100)
+        {
+            a = adc_val/100;
+            buf[0] = a + '0';
+            b = (adc_val % 100)/10;
+            buf[1] = b +'0';
+            c = (adc_val % 100) % 10;
+            buf[2] = c +'0';
+            buf[3] = '\n';
+            len = 4;
+        }
+
+        else if(adc_val < 100)
+        {
+            a = adc_val/10;
+            buf[0] = a + '0';
+            b = adc_val % 10;
+            buf[1] = b +'0';
+            buf[2] = '\n';
+            len = 3;
+        }
+
+        //len = sprintf(buf, "%3d\n", adc_val);
         sendStr(buf, len); 
     }
     ADC1_CR2    |= 1<<30;                   //IRQ Start again
@@ -161,6 +183,7 @@ void EXTI0_IRQHandler() {
     GPIOD_ODR ^= 1 << 15;
     EXTI_PR |= 1<<0;    // clear pending bit for EXTI0
 }
+
 
 
 int main (void)
