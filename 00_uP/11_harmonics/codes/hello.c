@@ -34,6 +34,7 @@ int main(void){
     for(int i=0; i<N; i++)
     {
         fprintf(file_out, "%d \t %.2f \n", i, polynomial[i]);
+        //printf("%f\n", polynomial[i]);
     }
 
     // fourier analysis
