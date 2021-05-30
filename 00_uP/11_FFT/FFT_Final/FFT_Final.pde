@@ -4,10 +4,12 @@ Serial Port;
 float xPos = 0;
 
 float xrp = 100;
-float yrp = 600;
+float yrp = 608;
 
 float inByte = 0;
 float pre_data = 0;
+
+int i = 0;
 
 void setup() {
   size(1400, 900);
@@ -25,8 +27,7 @@ void draw() {
   backGround();
   
   stroke(0,0,255);
-  line(xrp+xPos, yrp - pre_data ,xrp+xPos, yrp - inByte);
-  
+  line(xrp+xPos, yrp - pre_data   ,xrp+xPos, yrp - inByte);  //continuous graph
   if (xPos >= width) 
   {
     xPos = 0;
@@ -39,6 +40,7 @@ void draw() {
    xPos++; 
   }
   pre_data = inByte;
+  i++;
 }
 
 void serialEvent (Serial myPort) {
@@ -70,8 +72,8 @@ void backGround() {              //Like Arduino Serial Plotter Background Settin
   fill(0);
   textSize(15);
   text("0.0", 70, 600);
-  text("10.0", 60, 400);
-  text("20.0", 60, 200);
+  text("1000.0", 40, 400);
+  text("800.0", 60, 200);
   text("30.0", 60, 15);
   
 }

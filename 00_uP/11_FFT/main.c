@@ -6,7 +6,7 @@
 #define F 200       //Sampling Frequency(Speed)
 #define T 1/F       //Sampling Period
 #define A 1       //Amplitude
-#define N 200       //Number of sample Depth
+#define N 100       //Number of sample Depth
 #define H 32        //Number of harmonics
 #define PI 3.14
 
@@ -18,7 +18,7 @@ unsigned int l = 0;
 float buf[8];        //Space for ADC string
 unsigned int len;   //Space for ADC string len
 
-char polynomial[400];
+char polynomial[100];
 
 unsigned int tim2tick;  //Timer Variable:
 
@@ -192,7 +192,7 @@ void ADC1_IRQHandler() {
         polynomial[l] = adc_val;
         l++;
 
-        if (l == 400)
+        if (l == 100)
         {
             for(i = 0; i <N; i++)           //time advance 
             {                  
