@@ -5,7 +5,7 @@
 
 #define F 200       //Sampling Frequency(Speed)
 #define T 1/F       //Sampling Period
-#define A 5.0       //Amplitude
+#define A 1       //Amplitude
 #define N 200       //Number of sample Depth
 #define H 32        //Number of harmonics
 #define PI 3.14
@@ -161,7 +161,7 @@ void set_timer2() {
 void TIM2_IRQHandler() {
     TIM2_SR &= 0x00000000;
     tim2tick++;
-    if(tim2tick == 100)            //1000ms = 1s LED Toggle
+    if(tim2tick == 10)            //1000ms = 1s LED Toggle
     {
         GPIOD_ODR ^= 1<<13;         //LED Orange Blink
         ADC1_CR2  |= 1<<30;
@@ -215,7 +215,6 @@ void ADC1_IRQHandler() {
                 {
                     float probe = (float)(A)*sin(2*PI*probe_freq*T*i);
                     freq_component += probe * polynomial[i];    //polynomial get ADCvalue 
-
                     len = sprintf(buf, "%6f\n", freq_component);
                     sendStr(buf, len); 
                 }

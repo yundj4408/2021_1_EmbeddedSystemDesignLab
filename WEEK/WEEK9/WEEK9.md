@@ -1000,3 +1000,76 @@ void ADC1_IRQHandler() {
 - 교수님이 가르쳐주신 gnuplot 코드에서 바뀐거라곤 adc_val를 polynomial[i]에 넣어준 것이다. 
 - UART 통신으로 PC에 전송하기 위해 이전 수업에 사용했던 몫, 나머지 연산을 통해 구현할려 했지만 양수, 음수도 구분해야하고 float형식이여서 포기하고 sprintf를 사용하였다. 
 - 
+
+### 
+
+### Processing
+
+1. Processing 다운로드
+   <img src="./Pictures/1_processing.png" style="zoom:50%;" />
+
+
+
+2. 압축 파일을 받고 압축을 푼 후 processing-3.5.4에 들어가서 `./processing`으로 실행
+
+   
+   
+3. https://geronimob.tistory.com/36 사이트의 코드를 참고하여 Serial.list()[Port Number]와 baud rate를 수정하여 선으로 표현하였다.
+
+4. trim 함수 (https://www.arduino.cc/reference/ko/language/variables/data-types/string/functions/trim/)
+
+5. map 함수https://4343282.tistory.com/71
+
+
+
+내적을 통해 나왔고, 시간에 따라 (x축이 frequency domain이다. 값이 너무 크게 나와서 Probe의 amplitude 값을 5V에서 1V로 바뀐다. 
+
+그리고 freq값이 너무 크다. 그래서 freq = probe * ~~ 는 freq값을 /100으로 나눠서 serial plotting했ㄷ. 
+
+
+
+arduino 플로터랑 비슷하게
+
+
+
+신호3개 test, 3개 튀어 오른다. 
+
+
+
+https://sites.google.com/site/newdigitalart/peulosesing-menyueol
+
+
+
+x,y축 라인 배경 https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=roboholic84&logNo=220206761548
+
+
+
+amplitude값 바꿔서 측정해도 파형튀는건 똑같아서 모니터링할때 잘 표현해야겠다.
+
+그래서 소프트웨어 적으로도 변경해봤고
+![arduino](/home/dongjun/mygit/2021_1_EmbeddedSystemDesignLab/WEEK/WEEK9/Pictures/arduino.png)
+
+FFT Normal
+
+
+
+void backGround()
+
+- 아두이노 serial plotter와 유사하게 구현해봤다. 
+
+void setup()
+
+- 첫번째로 void setup에 window 사이즈를 설정해주고 흰 배경으로 세팅하였다. 
+
+- printArray(Serial.list())를 통해 ttyUSB0의 포트 번호를 확인하고 
+
+- Port에 33번으로 설정하고 Baud rate는 115200으로 설정하였다.
+
+
+
+void draw()
+
+- void draw()는 아두이노에서 void loop()이다. 
+
+- backGround()를 호출하여 초기 window를 세팅하였다.
+- 
