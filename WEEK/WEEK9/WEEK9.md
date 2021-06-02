@@ -1389,7 +1389,7 @@ void draw()
 #define F 200       //Sampling Frequency(Speed)
 #define T 1/F       //Sampling Period
 #define A 1       //Amplitude
-#define N 200       //Number of sample Depth
+#define N 100       //Number of sample Depth
 #define H 32        //Number of harmonics
 #define PI 3.14
 
@@ -1451,7 +1451,7 @@ unsigned int uart_data[423]= {
 10, 10, 10};                                //to Send data to computer
 
 
-void sendStr(char buf[], int max);
+//void sendStr(char buf[], int max);
 
 void clk(void)
 {
@@ -1579,37 +1579,30 @@ void ADC1_IRQHandler() {
         {
             for(i = 0; i <N; i++)           //time advance 
             {                  
-                int hi = 1;     //Harmonics 1 Hz
-        
-                for(j=0; j<H; j++)     //frequency
-                {
-                    float signal = (float)(A/hi)*sin(2*PI*hi*T*i);
-                    polynomial[i] += signal;
-                    hi = hi + 2;                                //1,3,5,7,9
-                }
-            }
+            
             // fourier analysis
             //int probe_freq = 2;
-            for (j=0; j<H; j++)     //fourier analysis H time (H frequency)
-            {
-                float freq_component = 0;
-                int probe_freq = j;
-                for (i=0; i<N; i++) //fourier analysis one time{ 
+                for (j=0; j<H; j++)     //fourier analysis H time (H frequency)
                 {
-                    float probe = (float)(A)*sin(2*PI*probe_freq*T*i);
-                    freq_component += probe * polynomial[i];    //polynomial get ADCvalue 
-                    len = sprintf(buf, "%6f\n", freq_component);
-                    sendStr(buf, len); 
+                    float freq_component = 0;
+                    int probe_freq = j;
+                    for (i=0; i<N; i++) //fourier analysis one time{ 
+                    {
+                        float probe = (float)(A)*sin(2*PI*probe_freq*T*i);
+                        freq_component += probe * polynomial[i];    //polynomial get ADCvalue 
+                        len = sprintf(buf, "%lf\n", freq_component);
+                        sendStr(buf, len); 
+                    }
                 }
-            }
-            l = 0;
-        } 
-
+            
+            } 
+        l = 0;
         //len = sprintf(buf, "%3d\n", adc_val);
         //sendStr(buf, len); 
-    }
+        }
     //ADC1_CR2    |= 1<<30;                   //IRQ Start again
-}
+    }
+ }
 
 void EXTI0_IRQHandler() {
 
@@ -1684,5 +1677,162 @@ void sendStr(char buf[], int max) {                        //1byte send
 }
 ```
 
+FFT Processing
 
+```java
+import processing.serial.*;
+
+Serial Port;
+float xPos = 0;
+
+float xrp = 100;
+float yrp = 608;
+
+float inByte = 0;
+float pre_data = 0;
+
+int i = 0;
+
+void setup() {
+  size(1400, 900);
+  background(255);
+  
+  printArray(Serial.list());
+  
+  Port = new Serial(this,Serial.list()[33], 115200);
+  Port.bufferUntil('\n');
+  
+}
+
+void draw() {
+  
+  backGround();
+  
+  stroke(0,0,255);
+  line(xrp+xPos, yrp - pre_data   ,xrp+xPos, yrp - inByte);  //continuous graph
+  if (xPos >= width) 
+  {
+    xPos = 0;
+    background(255);        //Reset
+    backGround();
+  }
+  
+  else
+  {
+   xPos++; 
+  }
+  pre_data = inByte;
+  i++;
+}
+
+void serialEvent (Serial myPort) {
+  String inString = myPort.readStringUntil('\n');
+  
+  if(inString != null)
+  {
+    inString = trim(inString);
+    inByte = float(inString);
+    println(inByte);
+    inByte = map(inByte, 0, 1023, 0, 100);
+  }
+}
+  
+  
+void backGround() {              //Like Arduino Serial Plotter Background Setting
+  stroke(0);
+  line(100, 10, 100, 800);      //y-axis  line(x1,y1,x2,y2) 
+  line(100, 800, 1400, 800);    //x-axis
+  
+  
+  stroke(204);                  //stroke(204,204,204) -> grey
+  line(100, 603, 1400, 603);    //0.0
+  line(100, 400, 1400, 400);    //10.0
+  line(100, 200, 1400, 200);    //20.0
+  line(100, 10, 1400, 10);      //30.0
+  
+  
+  fill(0);
+  textSize(15);
+  text("0.0", 70, 600);
+  text("200.0", 55, 400);
+  text("400.0", 55, 200)import processing.serial.*;
+
+Serial Port;
+float xPos = 0;
+
+float xrp = 100;
+float yrp = 608;
+
+float inByte = 0;
+float pre_data = 0;
+
+int i = 0;
+
+void setup() {
+  size(1400, 900);
+  background(255);
+  
+  printArray(Serial.list());
+  
+  Port = new Serial(this,Serial.list()[33], 115200);
+  Port.bufferUntil('\n');
+  
+}
+
+void draw() {
+  
+  backGround();
+  
+  stroke(0,0,255);
+  line(xrp+xPos, yrp - pre_data   ,xrp+xPos, yrp - inByte);  //continuous graph
+  if (xPos >= width) 
+  {
+    xPos = 0;
+    background(255);        //Reset
+    backGround();
+  }
+  
+  else
+  {
+   xPos++; 
+  }
+  pre_data = inByte;
+  i++;
+}
+
+void serialEvent (Serial myPort) {
+  String inString = myPort.readStringUntil('\n');
+  
+  if(inString != null)
+  {
+    inString = trim(inString);
+    inByte = float(inString);
+    println(inByte);
+    inByte = map(inByte, 0, 1023, 0, 100);
+  }
+}
+  
+  
+void backGround() {              //Like Arduino Serial Plotter Background Setting
+  stroke(0);
+  line(100, 10, 100, 800);      //y-axis  line(x1,y1,x2,y2) 
+  line(100, 800, 1400, 800);    //x-axis
+  
+  
+  stroke(204);                  //stroke(204,204,204) -> grey
+  line(100, 603, 1400, 603);    //0.0
+  line(100, 400, 1400, 400);    //10.0
+  line(100, 200, 1400, 200);    //20.0
+  line(100, 10, 1400, 10);      //30.0
+  
+  
+  fill(0);
+  textSize(15);
+  text("0.0", 70, 600);
+  text("200.0", 55, 400);
+  text("400.0", 55, 200);
+  text("600.0", 55, 15);
+  
+}
+```
 
