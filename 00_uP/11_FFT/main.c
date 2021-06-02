@@ -68,7 +68,7 @@ unsigned int uart_data[423]= {
 10, 10, 10};                                //to Send data to computer
 
 
-void sendStr(char buf[], int max);
+//void sendStr(char buf[], int max);
 
 void clk(void)
 {
@@ -196,37 +196,30 @@ void ADC1_IRQHandler() {
         {
             for(i = 0; i <N; i++)           //time advance 
             {                  
-                int hi = 1;     //Harmonics 1 Hz
-        
-                for(j=0; j<H; j++)     //frequency
-                {
-                    float signal = (float)(A/hi)*sin(2*PI*hi*T*i);
-                    polynomial[i] += signal;
-                    hi = hi + 2;                                //1,3,5,7,9
-                }
-            }
+            
             // fourier analysis
             //int probe_freq = 2;
-            for (j=0; j<H; j++)     //fourier analysis H time (H frequency)
-            {
-                float freq_component = 0;
-                int probe_freq = j;
-                for (i=0; i<N; i++) //fourier analysis one time{ 
+                for (j=0; j<H; j++)     //fourier analysis H time (H frequency)
                 {
-                    float probe = (float)(A)*sin(2*PI*probe_freq*T*i);
-                    freq_component += probe * polynomial[i];    //polynomial get ADCvalue 
-                    len = sprintf(buf, "%6f\n", freq_component);
-                    sendStr(buf, len); 
+                    float freq_component = 0;
+                    int probe_freq = j;
+                    for (i=0; i<N; i++) //fourier analysis one time{ 
+                    {
+                        float probe = (float)(A)*sin(2*PI*probe_freq*T*i);
+                        freq_component += probe * polynomial[i];    //polynomial get ADCvalue 
+                        len = sprintf(buf, "%lf\n", freq_component);
+                        sendStr(buf, len); 
+                    }
                 }
-            }
-            l = 0;
-        } 
-
+            
+            } 
+        l = 0;
         //len = sprintf(buf, "%3d\n", adc_val);
         //sendStr(buf, len); 
-    }
+        }
     //ADC1_CR2    |= 1<<30;                   //IRQ Start again
-}
+    }
+ }
 
 void EXTI0_IRQHandler() {
 

@@ -72,8 +72,8 @@ void backGround() {              //Like Arduino Serial Plotter Background Settin
   fill(0);
   textSize(15);
   text("0.0", 70, 600);
-  text("1000.0", 40, 400);
-  text("800.0", 60, 200);
-  text("30.0", 60, 15);
+  text("200.0", 55, 400);
+  text("400.0", 55, 200);
+  text("600.0", 55, 15);
   
 }
